@@ -23,11 +23,18 @@ jobs:
       - name: Build maven
         run: mvn -B package --file pom.xml
 
-      - name: Uploading artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BoardGame
-          path: target/*.jar
+      # - name: Uploading artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: BoardGame
+      #     path: target/*.jar
+      -  name: Upload artifact to Nexus
+         env:
+           NEXUS_URL: ${{ secrets.NEXUS_URL }}
+           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+         run: |
+           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file target/*.jar $NEXUS_URL/repository/Raw-File/
 
       - name: Trivy FS scan
         uses: aquasecurity/trivy-action@0.20.0
@@ -67,26 +74,35 @@ jobs:
         with:
           context: .
           push: true
-          tags: shashank30mishra/BoardGame:latest
+          tags: shashank30mishra/boardgame:latest
 
       - name: Trivy Image scan
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: 'shashank30mishra/BoardGame:latest'
+          image-ref: 'shashank30mishra/boardgame:latest'
           format: table
           output: 'trivy-image-report.html'
         env:
           TRIVY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWD }}
       
-      - name: Upload Trivy scan results to GitHub
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-fs-report
-          path: '${{ github.workspace }}/trivy-*-report.html'
-          retention-days: 2
+      # - name: Upload Trivy scan results to Nexus
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-fs-report
+      #     path: '${{ github.workspace }}/trivy-*-report.html'
+      #     retention-days: 2
+
+      -  name: Upload artifact to Nexus
+         env:
+           NEXUS_URL: ${{ secrets.NEXUS_URL }}
+           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+         run: |
+           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-*-report.html $NEXUS_URL/repository/Raw-File/
 
   deploy:
+    needs: build
     runs-on: kube-runner
 
     steps:
