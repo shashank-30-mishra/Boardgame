@@ -99,7 +99,8 @@ jobs:
            NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
            NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
          run: |
-           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-*-report.html $NEXUS_URL/repository/Raw-File/
+           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-fs-report.html $NEXUS_URL/repository/Raw-File/trivy-fs-report.html
+           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-image-report.html $NEXUS_URL/repository/Raw-File/trivy-image-report.html
 
   deploy:
     needs: build
