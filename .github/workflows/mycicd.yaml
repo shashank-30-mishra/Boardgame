@@ -113,7 +113,8 @@ jobs:
       - name: Setting Up Kubectl
         uses: actions-hub/kubectl@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          KUBE_HOST: ${{ secrets.KUBE_HOST }}
+          KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
 
       - name: Deploying on Kubernetes
         run: |
