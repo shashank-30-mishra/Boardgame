@@ -70,7 +70,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWD }}
 
       - name: Get PR HEAD Commit SHA
-        run: echo "HEAD Commit SHA:${{ github.event.pull_request.head.sha }}"
+        run: echo "HEAD Commit SHA:${{ github.event.workflow_run.head_sha }}"
       
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -78,7 +78,7 @@ jobs:
           context: .
           push: true
           # tags: shashank30mishra/boardgame:latest
-          tags: shashank30mishra/boardgame:${{ github.event.pull_request.head.sha }}
+          tags: shashank30mishra/boardgame:${{ github.event.workflow_run.head_sha }}
 
       # - name: Trivy Image scan
       #   uses: aquasecurity/trivy-action@0.20.0
