@@ -36,13 +36,13 @@ jobs:
       #    run: |
       #      curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file target/*.jar $NEXUS_URL/repository/Raw-File/
 
-      - name: Trivy FS scan
-        uses: aquasecurity/trivy-action@0.20.0
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: table
-          output: 'trivy-fs-report.html'
+      # - name: Trivy FS scan
+      #   uses: aquasecurity/trivy-action@0.20.0
+      #   with:
+      #     scan-type: 'fs'
+      #     scan-ref: '.'
+      #     format: table
+      #     output: 'trivy-fs-report.html'
       
       # - name: Sonar scan
       #   uses: sonarsource/sonarqube-scan-action@master
@@ -70,7 +70,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWD }}
 
       - name: Get PR HEAD Commit SHA
-        run: echo "HEAD Commit SHA:${{ github.event.workflow_run.head_sha }}"
+        run: echo "HEAD Commit SHA:${{ github.event.pull_request.head.sha }}"
       
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -78,7 +78,7 @@ jobs:
           context: .
           push: true
           # tags: shashank30mishra/boardgame:latest
-          tags: shashank30mishra/boardgame:${{ github.event.workflow_run.head_sha }}
+          tags: shashank30mishra/boardgame:${{ github.event.pull_request.head.sha }}
 
       # - name: Trivy Image scan
       #   uses: aquasecurity/trivy-action@0.20.0
