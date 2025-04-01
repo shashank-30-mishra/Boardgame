@@ -75,7 +75,7 @@ jobs:
           context: .
           push: true
           # tags: shashank30mishra/boardgame:latest
-          tags: shashank30mishra/boardgame:${{ github.sha }}
+          tags: shashank30mishra/boardgame:${{ github.event.pull_request.head.sha }}
 
       # - name: Trivy Image scan
       #   uses: aquasecurity/trivy-action@0.20.0
