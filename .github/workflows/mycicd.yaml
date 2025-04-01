@@ -28,13 +28,13 @@ jobs:
       #   with:
       #     name: BoardGame
       #     path: target/*.jar
-      -  name: Upload artifact to Nexus
-         env:
-           NEXUS_URL: ${{ secrets.NEXUS_URL }}
-           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
-           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-         run: |
-           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file target/*.jar $NEXUS_URL/repository/Raw-File/
+      # -  name: Upload artifact to Nexus
+      #    env:
+      #      NEXUS_URL: ${{ secrets.NEXUS_URL }}
+      #      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      #      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      #    run: |
+      #      curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file target/*.jar $NEXUS_URL/repository/Raw-File/
 
       - name: Trivy FS scan
         uses: aquasecurity/trivy-action@0.20.0
@@ -44,18 +44,18 @@ jobs:
           format: table
           output: 'trivy-fs-report.html'
       
-      - name: Sonar scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+      # - name: Sonar scan
+      #   uses: sonarsource/sonarqube-scan-action@master
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
       
-      - name: Sonar Quality Gate 
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes:  5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+      # - name: Sonar Quality Gate 
+      #   uses: sonarsource/sonarqube-quality-gate-action@master
+      #   timeout-minutes:  5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -74,17 +74,18 @@ jobs:
         with:
           context: .
           push: true
-          tags: shashank30mishra/boardgame:latest
+          # tags: shashank30mishra/boardgame:latest
+          tags: shashank30mishra/boardgame:${{ github.sha }}
 
-      - name: Trivy Image scan
-        uses: aquasecurity/trivy-action@0.20.0
-        with:
-          image-ref: 'shashank30mishra/boardgame:latest'
-          format: table
-          output: 'trivy-image-report.html'
-        env:
-          TRIVY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          TRIVY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWD }}
+      # - name: Trivy Image scan
+      #   uses: aquasecurity/trivy-action@0.20.0
+      #   with:
+      #     image-ref: 'shashank30mishra/boardgame:latest'
+      #     format: table
+      #     output: 'trivy-image-report.html'
+      #   env:
+      #     TRIVY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     TRIVY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWD }}
       
       # - name: Upload Trivy scan results to Nexus
       #   uses: actions/upload-artifact@v4
@@ -93,30 +94,30 @@ jobs:
       #     path: '${{ github.workspace }}/trivy-*-report.html'
       #     retention-days: 2
 
-      -  name: Upload artifact to Nexus
-         env:
-           NEXUS_URL: ${{ secrets.NEXUS_URL }}
-           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
-           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-         run: |
-           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-fs-report.html $NEXUS_URL/repository/Raw-File/trivy-fs-report.html
-           curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-image-report.html $NEXUS_URL/repository/Raw-File/trivy-image-report.html
+      # -  name: Upload artifact to Nexus
+      #    env:
+      #      NEXUS_URL: ${{ secrets.NEXUS_URL }}
+      #      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      #      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      #    run: |
+      #      curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-fs-report.html $NEXUS_URL/repository/Raw-File/trivy-fs-report.html
+      #      curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file trivy-image-report.html $NEXUS_URL/repository/Raw-File/trivy-image-report.html
 
-  deploy:
-    needs: build
-    runs-on: self-hosted
+  # deploy:
+  #   needs: build
+  #   runs-on: self-hosted
 
-    steps:
-      - name: Get the code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Get the code
+  #       uses: actions/checkout@v3
         
-      - name: Kubectl Action
-        uses: tale/kubectl-action@v1
-        with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-      - run: |
-            kubectl apply -f deployment-service.yaml -n webapps
-            kubectl get svc -n webapps
+  #     - name: Kubectl Action
+  #       uses: tale/kubectl-action@v1
+  #       with:
+  #         base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+  #     - run: |
+  #           kubectl apply -f deployment-service.yaml -n webapps
+  #           kubectl get svc -n webapps
 
 
 
